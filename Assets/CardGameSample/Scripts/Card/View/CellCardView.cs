@@ -1,30 +1,24 @@
+using System;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.InputSystem;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 
-namespace CardGameSample.Scripts.Card
+namespace CardGameSample.Scripts.Card.View
 {
-    [RequireComponent(typeof(CardPresenter))]
-    public class BattleCardView : MonoBehaviour, ICardView
+    public class CellCardView : MonoBehaviour, ICardView
     {
         [SerializeField] private TextMeshProUGUI attackPointsText;
         [SerializeField] private TextMeshProUGUI healthPointsText;
         [SerializeField] private Image cardImage;
-        
+
         [SerializeField] private string attackPrefix = "ATK:";
         [SerializeField] private string healthPrefix = "HP:";
 
-        private CardPresenter _cardPresenter;
         private AsyncOperationHandle<Sprite> _cardSpriteHandle;
-
-        private void Awake()
-        {
-            _cardPresenter = GetComponent<CardPresenter>();
-            _cardPresenter.Init(this);
-        }
 
         public int AttackPoints
         {
@@ -41,9 +35,15 @@ namespace CardGameSample.Scripts.Card
             set => LoadCardSprite(value).Forget();
         }
 
+        public event Action Press;
+
         private async UniTask LoadCardSprite(string key)
         {
-            Addressables.Release(_cardSpriteHandle);
+            if (_cardSpriteHandle.IsValid())
+            {
+                Addressables.Release(_cardSpriteHandle);
+            }
+            
             _cardSpriteHandle = Addressables.LoadAssetAsync<Sprite>(key);
             Sprite sprite = await _cardSpriteHandle;
             cardImage.sprite = sprite;
@@ -51,7 +51,15 @@ namespace CardGameSample.Scripts.Card
 
         private void OnDestroy()
         {
-            Addressables.Release(_cardSpriteHandle);
+            if (_cardSpriteHandle.IsValid())
+            {
+                Addressables.Release(_cardSpriteHandle);
+            }
+        }
+
+        public void OnClick(InputAction.CallbackContext context)
+        {
+            Debug.Log(context.ReadValue<float>());
         }
     }
 }

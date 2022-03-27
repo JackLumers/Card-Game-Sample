@@ -1,25 +1,26 @@
 using System;
-using UnityEngine;
 
 namespace CardGameSample.Scripts.Card
 {
-    [CreateAssetMenu(fileName = "NewCardModel", menuName = "CardModel")]
-    public class CardModel : ScriptableObject
+    public struct CardModel
     {
-        [SerializeField] private string _cardId;
-        [SerializeField] private string _spriteId;
-        [SerializeField] private int _attackPoints;
-        [SerializeField] private int _healthPoints;
+        private string _spriteId;
+        private int _attackPoints;
+        private int _healthPoints;
 
-        public string CardId
+        public CardModel(string cardRefId, string spriteId, int attackPoints, int healthPoints)
         {
-            get => _cardId;
-            set
-            {
-                _cardId = value;
-                cardIdChanged?.Invoke();
-            }
+            CardRefId = cardRefId;
+            _spriteId = spriteId;
+            _attackPoints = attackPoints;
+            _healthPoints = healthPoints;
+            
+            SpriteKeyChanged = null;
+            AttackPointsChanged = null;
+            HealthPointsChanged = null;
         }
+
+        public string CardRefId { get; }
 
         public string SpriteId
         {
@@ -27,7 +28,7 @@ namespace CardGameSample.Scripts.Card
             set
             {
                 _spriteId = value;
-                spriteKeyChanged?.Invoke();
+                SpriteKeyChanged?.Invoke(value);
             }
         }
 
@@ -37,7 +38,7 @@ namespace CardGameSample.Scripts.Card
             set
             {
                 _attackPoints = value;
-                attackPointsChanged?.Invoke();
+                AttackPointsChanged?.Invoke(value);
             }
         }
 
@@ -47,13 +48,12 @@ namespace CardGameSample.Scripts.Card
             set
             {
                 _healthPoints = value;
-                healthPointsChanged?.Invoke();
+                HealthPointsChanged?.Invoke(value);
             }
         }
-
-        public event Action cardIdChanged;
-        public event Action spriteKeyChanged;
-        public event Action attackPointsChanged;
-        public event Action healthPointsChanged;
+        
+        public event Action<string> SpriteKeyChanged;
+        public event Action<int> AttackPointsChanged;
+        public event Action<int> HealthPointsChanged;
     }
 }

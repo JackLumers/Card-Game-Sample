@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace CardGameSample.Scripts
 {
-    public class PlayerHand : MonoBehaviour
+    public class PlayerCardsHand : MonoBehaviour
     {
         
     }

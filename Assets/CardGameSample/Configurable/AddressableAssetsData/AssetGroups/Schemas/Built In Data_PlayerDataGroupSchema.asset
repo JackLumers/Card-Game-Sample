@@ -9,6 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c01eefbc48ef5f43a0ca6e4e5778507, type: 3}
-  m_Name: HorrorCardModel
+  m_Script: {fileID: 11500000, guid: b1487f5d688e4f94f828f879d599dbdc, type: 3}
+  m_Name: Built In Data_PlayerDataGroupSchema
   m_EditorClassIdentifier: 
+  m_Group: {fileID: 11400000, guid: 4dc85230f85b3f84790a7d775c35f937, type: 2}
+  m_IncludeResourcesFolders: 1
+  m_IncludeBuildSettingsScenes: 1

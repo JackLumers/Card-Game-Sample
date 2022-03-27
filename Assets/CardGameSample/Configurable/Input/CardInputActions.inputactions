@@ -1,0 +1,45 @@
+{
+    "name": "CardInputActions",
+    "maps": [
+        {
+            "name": "Card",
+            "id": "6f04ceb7-bf1f-47d4-a3cf-b4ac6d8da438",
+            "actions": [
+                {
+                    "name": "Click",
+                    "type": "Value",
+                    "id": "bd50d44d-1164-4050-b29d-460a00a570d2",
+                    "expectedControlType": "Digital",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "1082c4a2-473d-434d-b80d-2b79441a77e8",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4bc2f05b-6035-41a7-be9e-9eb892fe7a4a",
+                    "path": "<Touchscreen>/Press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
