@@ -1,10 +1,11 @@
 using CardGameSample.Scripts.Card.View;
+using ToolBox.Pools;
 using UnityEngine;
 
 namespace CardGameSample.Scripts.Card
 {
     [RequireComponent(typeof(ICardView))]
-    public class CardPresenter : MonoBehaviour
+    public class CardPresenter : MonoBehaviour, IPoolable
     {
         private ICardView _cardView;
         private CardModelRef _cardModelRef;
@@ -16,6 +17,16 @@ namespace CardGameSample.Scripts.Card
             _cardView = GetComponent<ICardView>();
 
             SubscribeModelActions(_cardModel);
+        }
+        
+        public void OnReuse()
+        {
+            
+        }
+
+        public void OnRelease()
+        {
+            
         }
         
         public void InitModel(CardModelRef modelRef)

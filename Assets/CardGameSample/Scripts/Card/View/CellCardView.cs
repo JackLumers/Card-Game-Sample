@@ -1,9 +1,7 @@
-using System;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.InputSystem;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 
@@ -35,8 +33,6 @@ namespace CardGameSample.Scripts.Card.View
             set => LoadCardSprite(value).Forget();
         }
 
-        public event Action Press;
-
         private async UniTask LoadCardSprite(string key)
         {
             if (_cardSpriteHandle.IsValid())
@@ -55,11 +51,6 @@ namespace CardGameSample.Scripts.Card.View
             {
                 Addressables.Release(_cardSpriteHandle);
             }
-        }
-
-        public void OnClick(InputAction.CallbackContext context)
-        {
-            Debug.Log(context.ReadValue<float>());
         }
     }
 }

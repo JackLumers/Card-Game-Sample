@@ -1,9 +1,6 @@
-﻿using System;
-using CardGameSample.Generated.Input;
-
-namespace CardGameSample.Scripts.Card.View
+﻿namespace CardGameSample.Scripts.Card.View
 {
-    public interface ICardView : CardInputActions.ICardActions
+    public interface ICardView
     {
         public int AttackPoints { set; }
 
@@ -13,7 +10,5 @@ namespace CardGameSample.Scripts.Card.View
         /// Sets the key for card sprite and updates the sprite
         /// </summary>
         public string CardSprite { set; }
-
-        public event Action Press;
     }
 }

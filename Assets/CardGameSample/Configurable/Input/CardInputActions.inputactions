@@ -2,14 +2,23 @@
     "name": "CardInputActions",
     "maps": [
         {
-            "name": "Card",
+            "name": "ActionMap",
             "id": "6f04ceb7-bf1f-47d4-a3cf-b4ac6d8da438",
             "actions": [
                 {
-                    "name": "Click",
+                    "name": "Press",
                     "type": "Value",
                     "id": "bd50d44d-1164-4050-b29d-460a00a570d2",
-                    "expectedControlType": "Digital",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Move",
+                    "type": "Value",
+                    "id": "fa551d78-132a-44e2-a6b1-4f5c9d33209b",
+                    "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -23,7 +32,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Click",
+                    "action": "Press",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -34,7 +43,29 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Click",
+                    "action": "Press",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "39ba780a-3dd5-40c0-990b-4479326b60b0",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2b1aec8c-8e0c-496b-adbd-f4a82b3511ed",
+                    "path": "<Touchscreen>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

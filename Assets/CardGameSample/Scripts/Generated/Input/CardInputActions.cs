@@ -26,14 +26,23 @@ namespace CardGameSample.Generated.Input
     ""name"": ""CardInputActions"",
     ""maps"": [
         {
-            ""name"": ""Card"",
+            ""name"": ""ActionMap"",
             ""id"": ""6f04ceb7-bf1f-47d4-a3cf-b4ac6d8da438"",
             ""actions"": [
                 {
-                    ""name"": ""Click"",
+                    ""name"": ""Press"",
                     ""type"": ""Value"",
                     ""id"": ""bd50d44d-1164-4050-b29d-460a00a570d2"",
-                    ""expectedControlType"": ""Digital"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Move"",
+                    ""type"": ""Value"",
+                    ""id"": ""fa551d78-132a-44e2-a6b1-4f5c9d33209b"",
+                    ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
@@ -47,7 +56,7 @@ namespace CardGameSample.Generated.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Click"",
+                    ""action"": ""Press"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -58,7 +67,29 @@ namespace CardGameSample.Generated.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Click"",
+                    ""action"": ""Press"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""39ba780a-3dd5-40c0-990b-4479326b60b0"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2b1aec8c-8e0c-496b-adbd-f4a82b3511ed"",
+                    ""path"": ""<Touchscreen>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -67,9 +98,10 @@ namespace CardGameSample.Generated.Input
     ],
     ""controlSchemes"": []
 }");
-            // Card
-            m_Card = asset.FindActionMap("Card", throwIfNotFound: true);
-            m_Card_Click = m_Card.FindAction("Click", throwIfNotFound: true);
+            // ActionMap
+            m_ActionMap = asset.FindActionMap("ActionMap", throwIfNotFound: true);
+            m_ActionMap_Press = m_ActionMap.FindAction("Press", throwIfNotFound: true);
+            m_ActionMap_Move = m_ActionMap.FindAction("Move", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -126,41 +158,50 @@ namespace CardGameSample.Generated.Input
             return asset.FindBinding(bindingMask, out action);
         }
 
-        // Card
-        private readonly InputActionMap m_Card;
-        private ICardActions m_CardActionsCallbackInterface;
-        private readonly InputAction m_Card_Click;
-        public struct CardActions
+        // ActionMap
+        private readonly InputActionMap m_ActionMap;
+        private IActionMapActions m_ActionMapActionsCallbackInterface;
+        private readonly InputAction m_ActionMap_Press;
+        private readonly InputAction m_ActionMap_Move;
+        public struct ActionMapActions
         {
             private @CardInputActions m_Wrapper;
-            public CardActions(@CardInputActions wrapper) { m_Wrapper = wrapper; }
-            public InputAction @Click => m_Wrapper.m_Card_Click;
-            public InputActionMap Get() { return m_Wrapper.m_Card; }
+            public ActionMapActions(@CardInputActions wrapper) { m_Wrapper = wrapper; }
+            public InputAction @Press => m_Wrapper.m_ActionMap_Press;
+            public InputAction @Move => m_Wrapper.m_ActionMap_Move;
+            public InputActionMap Get() { return m_Wrapper.m_ActionMap; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
             public bool enabled => Get().enabled;
-            public static implicit operator InputActionMap(CardActions set) { return set.Get(); }
-            public void SetCallbacks(ICardActions instance)
+            public static implicit operator InputActionMap(ActionMapActions set) { return set.Get(); }
+            public void SetCallbacks(IActionMapActions instance)
             {
-                if (m_Wrapper.m_CardActionsCallbackInterface != null)
+                if (m_Wrapper.m_ActionMapActionsCallbackInterface != null)
                 {
-                    @Click.started -= m_Wrapper.m_CardActionsCallbackInterface.OnClick;
-                    @Click.performed -= m_Wrapper.m_CardActionsCallbackInterface.OnClick;
-                    @Click.canceled -= m_Wrapper.m_CardActionsCallbackInterface.OnClick;
+                    @Press.started -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnPress;
+                    @Press.performed -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnPress;
+                    @Press.canceled -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnPress;
+                    @Move.started -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnMove;
+                    @Move.performed -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnMove;
+                    @Move.canceled -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnMove;
                 }
-                m_Wrapper.m_CardActionsCallbackInterface = instance;
+                m_Wrapper.m_ActionMapActionsCallbackInterface = instance;
                 if (instance != null)
                 {
-                    @Click.started += instance.OnClick;
-                    @Click.performed += instance.OnClick;
-                    @Click.canceled += instance.OnClick;
+                    @Press.started += instance.OnPress;
+                    @Press.performed += instance.OnPress;
+                    @Press.canceled += instance.OnPress;
+                    @Move.started += instance.OnMove;
+                    @Move.performed += instance.OnMove;
+                    @Move.canceled += instance.OnMove;
                 }
             }
         }
-        public CardActions @Card => new CardActions(this);
-        public interface ICardActions
+        public ActionMapActions @ActionMap => new ActionMapActions(this);
+        public interface IActionMapActions
         {
-            void OnClick(InputAction.CallbackContext context);
+            void OnPress(InputAction.CallbackContext context);
+            void OnMove(InputAction.CallbackContext context);
         }
     }
 }
