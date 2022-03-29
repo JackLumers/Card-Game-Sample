@@ -64,7 +64,7 @@ namespace CardGameSample.Scripts.Card.View
             }
         }
         
-        public UniTask Move(Vector2 screenPointerPosition)
+        public UniTask Move(Vector2 screenPointerPosition, float speed)
         {
             return Move(new Vector3(screenPointerPosition.x, screenPointerPosition.y, _rectTransform.localPosition.z));
         }

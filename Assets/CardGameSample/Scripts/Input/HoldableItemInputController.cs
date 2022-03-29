@@ -1,5 +1,4 @@
-﻿using ThirdPartyUtils;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 
@@ -8,8 +7,10 @@ namespace CardGameSample.Scripts.Input
     public class HoldableItemInputController : MonoBehaviour
     {
         [SerializeField] private InputSystemUIInputModule inputModule;
-        [SerializeField] private Canvas itemsCanvas;
-
+        [SerializeField] private RectTransform itemsRect;
+        [SerializeField] private Camera renderingCamera;
+        [SerializeField] private float itemMovingSpeed = 1f;
+        
         private IHoldableItem _holdenItem;
         
         private void Awake()
@@ -58,12 +59,14 @@ namespace CardGameSample.Scripts.Input
 
                 var touch = Touchscreen.current.primaryTouch;
                 var screenPosition = touch.position.ReadValue();
-                var calculatedPosition = itemsCanvas.ScreenToCanvasPosition(screenPosition);
+
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(itemsRect, screenPosition, renderingCamera,
+                    out Vector2 calculatedPosition);
                 
                 Debug.Log($"Screen position: {screenPosition}");
                 Debug.Log($"Calculated position: {calculatedPosition}");
                 
-                _holdenItem.Move(calculatedPosition);
+                _holdenItem.Move(calculatedPosition, itemMovingSpeed);
             };
         }
 
