@@ -33,6 +33,16 @@ namespace CardGameSample.Scripts.Card.View
             set => LoadCardSprite(value).Forget();
         }
 
+        public UniTask Move(Vector3 localPosition)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public UniTask Show(bool show)
+        {
+            throw new System.NotImplementedException();
+        }
+
         private async UniTask LoadCardSprite(string key)
         {
             if (_cardSpriteHandle.IsValid())

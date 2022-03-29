@@ -327,11 +327,11 @@ MonoBehaviour:
   cardsContainer: {fileID: 919184458}
   openedPosition: {x: 0, y: 2, z: -6.7}
   closedPosition: {x: 1.7, y: 3.2, z: -8.2}
-  spawnCardPosition: {x: 0, y: -10, z: -10}
+  spawnCardPosition: {x: 0, y: -600, z: -100}
   openedScale: {x: 1, y: 1, z: 1}
   closedScale: {x: 0.5, y: 0.5, z: 1}
   cardGivingTime: 0.5
-  spaceBetweenCards: 3
+  spaceBetweenCards: 300
 --- !u!114 &671519516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -958,8 +958,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputModule: {fileID: 1011509633}
-  renderingCamera: {fileID: 963194227}
-  itemContainer: {fileID: 919184458}
   itemsCanvas: {fileID: 671519514}
 --- !u!1001 &2137846155
 PrefabInstance:

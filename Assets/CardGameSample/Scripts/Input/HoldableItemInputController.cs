@@ -8,8 +8,6 @@ namespace CardGameSample.Scripts.Input
     public class HoldableItemInputController : MonoBehaviour
     {
         [SerializeField] private InputSystemUIInputModule inputModule;
-        [SerializeField] private Camera renderingCamera;
-        [SerializeField] private RectTransform itemContainer;
         [SerializeField] private Canvas itemsCanvas;
 
         private IHoldableItem _holdenItem;

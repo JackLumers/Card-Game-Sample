@@ -1,4 +1,5 @@
 using CardGameSample.Scripts.Card.View;
+using Cysharp.Threading.Tasks;
 using ToolBox.Pools;
 using UnityEngine;
 
@@ -19,11 +20,17 @@ namespace CardGameSample.Scripts.Card
             SubscribeModelActions(_cardModel);
         }
         
+        /// <summary>
+        /// Called when this game object is reused from pool
+        /// </summary>
         public void OnReuse()
         {
             
         }
 
+        /// <summary>
+        /// Called when this game object is released back in pool
+        /// </summary>
         public void OnRelease()
         {
             
@@ -39,6 +46,11 @@ namespace CardGameSample.Scripts.Card
             _cardView.AttackPoints = _cardModel.AttackPoints;
             _cardView.HealthPoints = _cardModel.HealthPoints;
             _cardView.CardSprite = _cardModel.SpriteId;
+        }
+
+        public UniTask Move(Vector3 localPosition)
+        {
+            return _cardView.Move(localPosition);
         }
         
         private void SubscribeModelActions(CardModel model)

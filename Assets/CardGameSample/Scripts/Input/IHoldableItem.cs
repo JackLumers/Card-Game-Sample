@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace CardGameSample.Scripts.Input
 {
@@ -6,6 +7,6 @@ namespace CardGameSample.Scripts.Input
     {
         public void Hold(bool hold);
 
-        public void Move(Vector2 screenPointerPosition);
+        public UniTask Move(Vector2 screenPointerPosition);
     }
 }

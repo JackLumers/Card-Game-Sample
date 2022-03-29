@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using CardGameSample.Scripts.Card;
 using CardGameSample.Scripts.ScriptableValues;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using ToolBox.Pools;
 using UnityEngine;
 
@@ -16,23 +15,17 @@ namespace CardGameSample.Scripts
         
         [Space] [SerializeField] private RectTransform cardsContainer;
         [Space]
-        [SerializeField] private Vector3 openedPosition;
-        [SerializeField] private Vector3 closedPosition;
         [SerializeField] private Vector3 spawnCardPosition;
         [Space]
-        [SerializeField] private Vector3 openedScale = Vector3.one;
-        [SerializeField] private Vector3 closedScale = new Vector3(0.5f, 0.5f, 1f);
         [Space]
         [SerializeField] private float cardGivingTime = 0.5f;
         [SerializeField] private float spaceBetweenCards = 0.5f;
         
-        private readonly HashSet<CardPresenter> _cards = new HashSet<CardPresenter>();
-        private float _cardsStartPosition;
+        private readonly List<CardPresenter> _cards = new List<CardPresenter>();
         
         private void Awake()
         {
             cardPrefab.Populate(cardsPoolPopulation.Value);
-            _cardsStartPosition = -cardsContainer.rect.width / 2;
         }
         
         /// <summary>
@@ -46,30 +39,36 @@ namespace CardGameSample.Scripts
             // It's not a big overhead in this case but I just want to write it down.
             
             var cardObject = cardPrefab.Reuse().GetComponent<CardPresenter>();
-
+            cardObject.InitModel(modelRef);
+            cardObject.gameObject.SetActive(true);
+            
             var cardTransform = cardObject.transform;
             cardTransform.SetParent(cardsContainer);
+            cardTransform.localPosition = spawnCardPosition;
             cardTransform.localRotation = Quaternion.identity;
             cardTransform.localScale = Vector3.one;
 
-            cardObject.gameObject.SetActive(false);
-
-            cardObject.InitModel(modelRef);
-
             _cards.Add(cardObject);
             
-            await GivingCardAnimationProcess(cardObject, _cards.Count, cardGivingTime);
+            await RepositionCards();
         }
 
-        private async UniTask GivingCardAnimationProcess(CardPresenter cardObject, int currentCardsCount, float time)
+        public async UniTask RepositionCards()
         {
             try
             {
-                cardObject.transform.localPosition = spawnCardPosition;
-                cardObject.gameObject.SetActive(true);
-                
-                var position = CalculateNextCardPosition(spaceBetweenCards, currentCardsCount);
-                await cardObject.transform.DOLocalMove(position, time).ToUniTask();
+                if(_cards.Count == 0) return;
+            
+                float cardWidth = ((RectTransform)cardPrefab.transform).rect.width;
+                var positions = CalculateCardPositions(cardWidth, spaceBetweenCards, _cards.Count);
+
+                List<UniTask> movingTasks = new List<UniTask>();
+                for (int i = 0; i < positions.Length; i++)
+                {
+                    movingTasks.Add(_cards[i].Move(positions[i]));
+                }
+            
+                await UniTask.WhenAll(movingTasks);
             }
             catch (Exception e)
             {
@@ -78,15 +77,20 @@ namespace CardGameSample.Scripts
             }
         }
 
-        private Vector3 CalculateNextCardPosition(float space, int currentCardsCount)
+        private Vector3[] CalculateCardPositions(float cardWidth, float space, int currentCardsCount)
         {
-            if (currentCardsCount <= 1)
-            {
-                return new Vector3(_cardsStartPosition, 0, 0);
-            }
+            Vector3[] positions = new Vector3[currentCardsCount];
+            float step = cardWidth / 2 + space / 2;
+            float centerPositionX = step * (currentCardsCount - 1) / 2;
             
-            var positionX = _cardsStartPosition + (space * currentCardsCount - space);
-            return new Vector3(positionX, 0, 0);
+            for (int i = 0; i < currentCardsCount; i++)
+            {
+                float positionX = step * i - centerPositionX;
+
+                positions[i] = new Vector3(positionX, 0, 0);
+            }
+
+            return positions;
         }
     }
 }
