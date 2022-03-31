@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CardGameSample.Scripts.ScriptableValues
 {
-    [CreateAssetMenu(fileName = "NewScriptableInt", menuName = "ScriptableValues/Integer")]
+    [CreateAssetMenu(fileName = "NewScriptableInt", menuName = "Scriptable Values/Integer")]
     public class ScriptableInt : ScriptableObject
     {
         [SerializeField] private int value;

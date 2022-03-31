@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd3d826bf52f49f29dd325b00d4fd2d3, type: 3}
+  m_Name: EnemyTurnState
+  m_EditorClassIdentifier: 
+  nextState: {fileID: 11400000, guid: 2dc861900bdef934383d0672ab26510c, type: 2}

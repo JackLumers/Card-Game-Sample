@@ -2,7 +2,7 @@
 
 namespace CardGameSample.Scripts.Card
 {
-    [CreateAssetMenu(fileName = "NewCardModelRef", menuName = "CardModelReference")]
+    [CreateAssetMenu(fileName = "NewCardModelRef", menuName = "Create Card Model Reference")]
     public class CardModelRef : ScriptableObject
     {
         [SerializeField] private string cardRefId;

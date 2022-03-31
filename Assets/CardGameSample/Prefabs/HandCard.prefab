@@ -264,13 +264,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb4e7a80323a428fa8d0f90245a4f71a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  presenter: {fileID: 632488853921298460}
   attackPointsText: {fileID: 7369109772346205872}
   healthPointsText: {fileID: 8051889317301445027}
   cardImage: {fileID: 555885930540281471}
   backgroundImage: {fileID: 7585564666222920028}
+  backgroundTintColor: {r: 0, g: 0.96870255, b: 1, a: 1}
   attackPrefix: 'ATK:'
   healthPrefix: 'HP:'
-  moveSpeed: 500
   scaleSpeed: 1
   scaleWhileHoldValue: 1.2
 --- !u!114 &632488853921298460

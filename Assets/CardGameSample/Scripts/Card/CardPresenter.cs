@@ -1,73 +1,50 @@
 using CardGameSample.Scripts.Card.View;
-using Cysharp.Threading.Tasks;
-using ToolBox.Pools;
 using UnityEngine;
 
 namespace CardGameSample.Scripts.Card
 {
     [RequireComponent(typeof(ICardView))]
-    public class CardPresenter : MonoBehaviour, IPoolable
+    public class CardPresenter : MonoBehaviour
     {
-        private ICardView _cardView;
-        private CardModelRef _cardModelRef;
+        public ICardView CardView { get; private set; }
+        public CardModelRef CardModelRef { get; private set; }
         
         private CardModel _cardModel;
 
         private void Awake()
         {
-            _cardView = GetComponent<ICardView>();
+            CardView = GetComponent<ICardView>();
 
             SubscribeModelActions(_cardModel);
         }
-        
-        /// <summary>
-        /// Called when this game object is reused from pool
-        /// </summary>
-        public void OnReuse()
-        {
-            
-        }
 
-        /// <summary>
-        /// Called when this game object is released back in pool
-        /// </summary>
-        public void OnRelease()
-        {
-            
-        }
-        
         public void InitModel(CardModelRef modelRef)
         {
-            _cardModelRef = modelRef;
-            _cardModel = _cardModelRef.CreateModel();
+            CardModelRef = modelRef;
+            _cardModel = CardModelRef.CreateModel();
 
             SubscribeModelActions(_cardModel);
             
-            _cardView.AttackPoints = _cardModel.AttackPoints;
-            _cardView.HealthPoints = _cardModel.HealthPoints;
-            _cardView.CardSprite = _cardModel.SpriteId;
+            CardView.AttackPoints = _cardModel.AttackPoints;
+            CardView.HealthPoints = _cardModel.HealthPoints;
+            CardView.CardSprite = _cardModel.SpriteId;
         }
 
-        public UniTask Move(Vector3 localPosition)
-        {
-            return _cardView.Move(localPosition);
-        }
-        
         private void SubscribeModelActions(CardModel model)
         {
             model.AttackPointsChanged += (newValue) =>
             {
-                _cardView.AttackPoints = newValue;
+                CardView.AttackPoints = newValue;
             };
             
             model.HealthPointsChanged += (newValue) =>
             {
-                _cardView.HealthPoints = newValue;
+                CardView.HealthPoints = newValue;
             };
             
             model.SpriteKeyChanged += (newValue) =>
             {
-                _cardView.CardSprite = newValue;
+                CardView.CardSprite = newValue;
             };
         }
     }

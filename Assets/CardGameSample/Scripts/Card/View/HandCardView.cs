@@ -1,10 +1,13 @@
 ﻿using System;
+using CardGameSample.Scripts.Battlefield;
 using CardGameSample.Scripts.Input;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
+using JetBrains.Annotations;
 using TMPro;
+using ToolBox.Pools;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -12,26 +15,46 @@ using UnityEngine.UI;
 
 namespace CardGameSample.Scripts.Card.View
 {
-    public class HandCardView : MonoBehaviour, ICardView, IHoldableItem
+    public class HandCardView : MonoBehaviour, ICardView, IHoldableObject, IPoolable
     {
-        [SerializeField] private TextMeshProUGUI attackPointsText;
+        #region SerializableFields
+
+        [SerializeField] private CardPresenter presenter;
+
+        [Space] [SerializeField] private TextMeshProUGUI attackPointsText;
         [SerializeField] private TextMeshProUGUI healthPointsText;
         [SerializeField] private Image cardImage;
         [SerializeField] private Image backgroundImage;
 
-        [SerializeField] private string attackPrefix = "ATK:";
+        [Space] [SerializeField] private Color backgroundTintColor;
+
+        [Space] [SerializeField] private string attackPrefix = "ATK:";
         [SerializeField] private string healthPrefix = "HP:";
 
-        [SerializeField] private float moveSpeed = 1f;
-        [SerializeField] private float scaleSpeed = 1f;
+        [Space] [SerializeField] private float scaleSpeed = 1f;
         [SerializeField] private float scaleWhileHoldValue = 1.2f;
-        
-        private RectTransform _rectTransform;
-        
+
+        #endregion
+
+        #region Fields
+
         private AsyncOperationHandle<Sprite> _cardSpriteHandle;
-        private TweenerCore<Vector3, Vector3, VectorOptions> _movingTweener;
-        private TweenerCore<Vector3, Vector3, VectorOptions> _scalingTweener;
-        
+
+        [CanBeNull] private TweenerCore<Vector3, Vector3, VectorOptions> _movingTweener;
+        [CanBeNull] private TweenerCore<Vector3, Vector3, VectorOptions> _scalingTweener;
+        [CanBeNull] private TweenerCore<Quaternion, Quaternion, NoOptions> _rotationTweener;
+
+        private Color _baseBackgroundColor;
+        private RectTransform _rectTransform;
+
+        #endregion
+
+        #region Properties
+
+        public CardPresenter Presenter => presenter;
+
+        public GameObject GameObject => gameObject;
+
         public int AttackPoints
         {
             set => attackPointsText.text = $"{attackPrefix} {value}";
@@ -47,14 +70,28 @@ namespace CardGameSample.Scripts.Card.View
             set => LoadCardSprite(value).Forget();
         }
 
-        public async UniTask Move(Vector3 localPosition)
+        #endregion
+
+        #region Methods
+
+        public async UniTask AnimatePlaceCardOnCell(HandCardView handCardView, BattlefieldCell battlefieldCell)
+        {
+            await UniTask.WhenAll
+            (
+                handCardView.Move(battlefieldCell.CellCanvas.transform.position, 0.5f, false),
+                handCardView.Rotate(battlefieldCell.CellCanvas.transform.rotation, 0.5f, false)
+            );
+        }
+
+        public async UniTask MoveLocal(Vector3 localPosition, float speedOrDuration, bool speedBased)
         {
             try
             {
+                gameObject.SetActive(true);
                 _movingTweener?.Kill();
                 _movingTweener = _rectTransform.DOLocalMove(
-                    new Vector3(localPosition.x, localPosition.y, localPosition.z), 
-                    moveSpeed).SetSpeedBased(true);
+                    new Vector3(localPosition.x, localPosition.y, localPosition.z),
+                    speedOrDuration).SetSpeedBased(speedBased);
                 await _movingTweener;
             }
             catch (Exception e)
@@ -63,36 +100,76 @@ namespace CardGameSample.Scripts.Card.View
                 throw;
             }
         }
-        
-        public UniTask Move(Vector2 screenPointerPosition, float speed)
+
+        public async UniTask Move(Vector3 worldPosition, float speedOrDuration, bool speedBased)
         {
-            return Move(new Vector3(screenPointerPosition.x, screenPointerPosition.y, _rectTransform.localPosition.z));
+            try
+            {
+                gameObject.SetActive(true);
+                _movingTweener?.Kill();
+                _movingTweener = _rectTransform.DOMove(
+                    new Vector3(worldPosition.x, worldPosition.y, worldPosition.z),
+                    speedOrDuration).SetSpeedBased(speedBased);
+                await _movingTweener;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                throw;
+            }
         }
 
-        public UniTask Show(bool show)
+        public async UniTask Rotate(Quaternion rotation, float speedOrDuration, bool speedBased)
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                gameObject.SetActive(true);
+                _rotationTweener?.Kill();
+                _rotationTweener = _rectTransform.DORotateQuaternion(rotation,
+                    speedOrDuration).SetSpeedBased(speedBased);
+                await _rotationTweener;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                throw;
+            }
         }
 
-        private void Awake()
+        public UniTask MoveByHold(Vector2 localPosition, float speed)
         {
-            _rectTransform = (RectTransform) transform;
+            return MoveLocal(
+                new Vector3(localPosition.x, localPosition.y, _rectTransform.localPosition.z),
+                speed, true);
         }
 
-        public void Hold(bool hold)
+        public void Hold(Vector2 screenPointerPosition, bool hold)
         {
             if (hold)
             {
                 _scalingTweener?.Kill();
                 _scalingTweener = transform.DOScale(
-                    new Vector3(scaleWhileHoldValue, scaleWhileHoldValue, 1f), 
-                    scaleSpeed).SetSpeedBased(true);
+                        new Vector3(scaleWhileHoldValue, scaleWhileHoldValue, 1f), scaleSpeed)
+                    .SetSpeedBased(true);
             }
             else
             {
                 _scalingTweener?.Kill();
                 _scalingTweener = transform.DOScale(
-                    new Vector3(1, 1, 1), scaleSpeed).SetSpeedBased(true);
+                        new Vector3(1, 1, 1), scaleSpeed)
+                    .SetSpeedBased(true);
+            }
+        }
+
+        public void TintBackground(bool tint)
+        {
+            if (tint)
+            {
+                backgroundImage.color = backgroundTintColor;
+            }
+            else
+            {
+                backgroundImage.color = _baseBackgroundColor;
             }
         }
 
@@ -104,7 +181,7 @@ namespace CardGameSample.Scripts.Card.View
                 {
                     Addressables.Release(_cardSpriteHandle);
                 }
-            
+
                 _cardSpriteHandle = Addressables.LoadAssetAsync<Sprite>(key);
                 Sprite sprite = await _cardSpriteHandle;
                 cardImage.sprite = sprite;
@@ -116,6 +193,16 @@ namespace CardGameSample.Scripts.Card.View
             }
         }
 
+        #endregion
+        
+        #region MonoBehaviourCallbacks
+
+        private void Awake()
+        {
+            _rectTransform = (RectTransform) transform;
+            _baseBackgroundColor = backgroundImage.color;
+        }
+
         private void OnDestroy()
         {
             if (_cardSpriteHandle.IsValid())
@@ -123,5 +210,25 @@ namespace CardGameSample.Scripts.Card.View
                 Addressables.Release(_cardSpriteHandle);
             }
         }
+
+        #endregion
+        
+        #region PoolingCallbacks
+
+        public void OnReuse()
+        {
+            _movingTweener?.Kill();
+            _rotationTweener?.Kill();
+            _scalingTweener?.Kill();
+        }
+
+        public void OnRelease()
+        {
+            _movingTweener?.Kill();
+            _rotationTweener?.Kill();
+            _scalingTweener?.Kill();
+        }
+
+        #endregion
     }
 }

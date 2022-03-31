@@ -33,6 +33,30 @@ MonoBehaviour:
     m_Address: skull
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 3f6677e8e1c95934384688855abded4b
+    m_Address: blackHeart
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4d435067b3a20654695df0904aed4a81
+    m_Address: forestGuard
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 27df74511b2ad124ca458bf08b0e7fbf
+    m_Address: knight
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 2e8b932b6e84bd345a463cd179d752eb
+    m_Address: nimph
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: f4cb41e8ee226a44489840b87105efe8
+    m_Address: raven
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: acbf2e3a5c9ee7046bba4f8ea725f4bb
+    m_Address: undead
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: be2773dcc8a354b4abd9175cad09d1d9, type: 2}
   m_SchemaSet:

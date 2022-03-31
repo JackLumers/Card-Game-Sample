@@ -163,6 +163,7 @@ GameObject:
   - component: {fileID: 7216794595393158162}
   - component: {fileID: 8816618152766865668}
   - component: {fileID: 7026279100103728410}
+  - component: {fileID: 8000788108268556099}
   m_Layer: 0
   m_Name: CellCard
   m_TagString: Untagged
@@ -204,11 +205,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 964bc7a29c8c95940898d6a8ded0bf62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  presenter: {fileID: 7026279100103728410}
   attackPointsText: {fileID: 1081146024887468982}
   healthPointsText: {fileID: 503093037693633701}
   cardImage: {fileID: 7994928998386617209}
   attackPrefix: 'ATK:'
   healthPrefix: 'HP:'
+  canvasGroup: {fileID: 8000788108268556099}
+  showDuration: 0.5
 --- !u!114 &7026279100103728410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -221,6 +225,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 302c0eb3e5329134f8aa87794da9e7a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!225 &8000788108268556099
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4845308872207349128}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &6717029012462311080
 GameObject:
   m_ObjectHideFlags: 0

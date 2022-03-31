@@ -1,22 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using CardGameSample.Scripts.Card;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace CardGameSample.Scripts
 {
-    public class TestCardDeck : MonoBehaviour
+    [CreateAssetMenu(fileName = "TestCardDeck", menuName = "Create Test Card Deck")]
+    public sealed class TestCardDeck : ScriptableObject
     {
-        [SerializeField] private PlayerCardsHand playerCardsHand;
         [SerializeField] private List<CardModelRef> cardModelsRefs = new List<CardModelRef>();
-        
-        private async void OnEnable()
-        {
-            await UniTask.Delay(1000);
-            foreach (var cardModelRef in cardModelsRefs)
-            {
-                await playerCardsHand.AddCard(cardModelRef);
-            }
-        }
+
+        public ReadOnlyCollection<CardModelRef> Cards => cardModelsRefs.AsReadOnly();
     }
 }
