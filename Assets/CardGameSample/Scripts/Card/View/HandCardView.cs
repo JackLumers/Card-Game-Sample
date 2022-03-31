@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using CardGameSample.Scripts.Battlefield;
 using CardGameSample.Scripts.Input;
 using Cysharp.Threading.Tasks;
@@ -15,7 +16,7 @@ using UnityEngine.UI;
 
 namespace CardGameSample.Scripts.Card.View
 {
-    public class HandCardView : MonoBehaviour, ICardView, IHoldableObject, IPoolable
+    public class HandCardView : MonoBehaviour, ICardView, IHoldableObject
     {
         #region SerializableFields
 
@@ -39,10 +40,11 @@ namespace CardGameSample.Scripts.Card.View
         #region Fields
 
         private AsyncOperationHandle<Sprite> _cardSpriteHandle;
-
+        [CanBeNull] private CancellationTokenSource _cardSpriteLoadingCts;
         [CanBeNull] private TweenerCore<Vector3, Vector3, VectorOptions> _movingTweener;
         [CanBeNull] private TweenerCore<Vector3, Vector3, VectorOptions> _scalingTweener;
         [CanBeNull] private TweenerCore<Quaternion, Quaternion, NoOptions> _rotationTweener;
+
 
         private Color _baseBackgroundColor;
         private RectTransform _rectTransform;
@@ -65,7 +67,7 @@ namespace CardGameSample.Scripts.Card.View
             set => healthPointsText.text = $"{healthPrefix} {value}";
         }
 
-        public string CardSprite
+        public string SpriteId
         {
             set => LoadCardSprite(value).Forget();
         }
@@ -128,6 +130,7 @@ namespace CardGameSample.Scripts.Card.View
                 _rotationTweener = _rectTransform.DORotateQuaternion(rotation,
                     speedOrDuration).SetSpeedBased(speedBased);
                 await _rotationTweener;
+                _rotationTweener = null;
             }
             catch (Exception e)
             {
@@ -175,6 +178,9 @@ namespace CardGameSample.Scripts.Card.View
 
         private async UniTask LoadCardSprite(string key)
         {
+            _cardSpriteLoadingCts?.Cancel();
+            _cardSpriteLoadingCts = new CancellationTokenSource();
+            
             try
             {
                 if (_cardSpriteHandle.IsValid())
@@ -183,8 +189,15 @@ namespace CardGameSample.Scripts.Card.View
                 }
 
                 _cardSpriteHandle = Addressables.LoadAssetAsync<Sprite>(key);
-                Sprite sprite = await _cardSpriteHandle;
-                cardImage.sprite = sprite;
+                
+                var gettingSpriteTask = await _cardSpriteHandle
+                    .WithCancellation(_cardSpriteLoadingCts.Token)
+                    .SuppressCancellationThrow();
+                
+                if (!gettingSpriteTask.IsCanceled)
+                {
+                    cardImage.sprite = gettingSpriteTask.Result;
+                }
             }
             catch (Exception e)
             {
@@ -209,24 +222,6 @@ namespace CardGameSample.Scripts.Card.View
             {
                 Addressables.Release(_cardSpriteHandle);
             }
-        }
-
-        #endregion
-        
-        #region PoolingCallbacks
-
-        public void OnReuse()
-        {
-            _movingTweener?.Kill();
-            _rotationTweener?.Kill();
-            _scalingTweener?.Kill();
-        }
-
-        public void OnRelease()
-        {
-            _movingTweener?.Kill();
-            _rotationTweener?.Kill();
-            _scalingTweener?.Kill();
         }
 
         #endregion

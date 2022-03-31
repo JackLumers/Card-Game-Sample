@@ -2,7 +2,9 @@
 using System.Threading;
 using CardGameSample.Scripts.Battlefield;
 using CardGameSample.Scripts.Card;
+using CardGameSample.Scripts.Card.View;
 using Cysharp.Threading.Tasks;
+using ToolBox.Pools;
 using UnityEngine;
 
 namespace CardGameSample.Scripts.BattleController.States
@@ -12,12 +14,15 @@ namespace CardGameSample.Scripts.BattleController.States
     {
         [SerializeField] private ABattleState nextState;
         [SerializeField] private int turnDurationMillis = 15000;
+        [SerializeField] private int maxCardsToPlay = 2;
 
+        private int _currentsCardsPlayedCount = 0;
         private CancellationTokenSource _stateCancellationTokenSource;
 
         public override void ResetState()
         {
             _stateCancellationTokenSource?.Cancel();
+            _currentsCardsPlayedCount = 0;
             
             BattleController.CardPlaced -= OnCardPlaced;
         }
@@ -26,10 +31,13 @@ namespace CardGameSample.Scripts.BattleController.States
         {
             _stateCancellationTokenSource?.Cancel();
             _stateCancellationTokenSource = new CancellationTokenSource();
-
+            _currentsCardsPlayedCount = 0;
+            
             BattleController.SetTurnCount(BattleController.CurrentTurnCount + 1);
+
             BattleController.CardPlaced += OnCardPlaced;
             
+            BattleController.TurnTimer.StopAndSetDuration(0);
             TurnProcess(_stateCancellationTokenSource.Token).Forget();
         }
         
@@ -40,29 +48,30 @@ namespace CardGameSample.Scripts.BattleController.States
             BattleController.CardPlaced -= OnCardPlaced;
             BattleController.TurnTimer.StopTimer();
         }
-        
-        private void OnCardPlaced(CardModelRef cardModelRef, BattlefieldCell cell)
-        {
-            if (!BattleController.BattlefieldController.IsPlayerCellsFull) return;
-            
-            _stateCancellationTokenSource?.Cancel();
-                
-            StateMachine.ChangeState(nextState);
-        }
-        
+
         private async UniTask TurnProcess(CancellationToken cancellationToken)
         {
+            if(cancellationToken.IsCancellationRequested) return;
+            
+            BattleController.BlockPlayerHandInput(true);
+            
             try
             {
-                BattleController.BlockPlayerHandInput(true);
+                await BattleController.FillPlayerHand()
+                    .AttachExternalCancellation(cancellationToken)
+                    .SuppressCancellationThrow();
                 
-                await BattleController.FillPlayerHand().AttachExternalCancellation(cancellationToken);
+                if(cancellationToken.IsCancellationRequested) return;
                 
                 BattleController.BlockPlayerHandInput(false);
                 
-                await BattleController.TurnTimer.StartTimer(turnDurationMillis).AttachExternalCancellation(cancellationToken);
+                await BattleController.TurnTimer.StartTimer(turnDurationMillis)
+                    .AttachExternalCancellation(cancellationToken)
+                    .SuppressCancellationThrow();
                 
-                OnTimerEnd();
+                if(cancellationToken.IsCancellationRequested) return;
+
+                StateMachine.ChangeState(nextState);
             }
             catch (Exception e)
             {
@@ -70,11 +79,55 @@ namespace CardGameSample.Scripts.BattleController.States
                 throw;
             }
         }
-
-        private void OnTimerEnd()
+        
+        private void OnCardPlaced(HandCardView handCardView, BattlefieldCell cell)
         {
-            _stateCancellationTokenSource?.Cancel();
-            StateMachine.ChangeState(nextState);
+            _currentsCardsPlayedCount++;
+            
+            if (_currentsCardsPlayedCount == maxCardsToPlay)
+            {
+                BattleController.BlockPlayerHandInput(true);
+            }
+            
+            WaitForCardAttackAnimationAndProceed(handCardView, cell).Forget();
+        }
+
+        private async UniTask WaitForCardAttackAnimationAndProceed(HandCardView handCardView, BattlefieldCell cell)
+        {
+            BattleController.BlockPlayerHandInput(true);
+            
+            var modelRef = handCardView.Presenter.CardModelRef;
+
+            try
+            {
+                await handCardView.AnimatePlaceCardOnCell(handCardView, cell);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+            
+            handCardView.gameObject.Release();
+            
+            if (_stateCancellationTokenSource.IsCancellationRequested) return;
+            
+            await cell.PlaceCard(modelRef);
+            
+            await BattleController.BattlefieldController.PlayerCellAttack(cell)
+                .AttachExternalCancellation(_stateCancellationTokenSource.Token)
+                .SuppressCancellationThrow();
+
+            if (_currentsCardsPlayedCount == maxCardsToPlay)
+            {
+                BattleController.TurnTimer.StopAndSetDuration(0);
+
+                _stateCancellationTokenSource?.Cancel();
+                StateMachine.ChangeState(nextState);
+            }
+            else
+            {
+                BattleController.BlockPlayerHandInput(false);
+            }
         }
     }
 }

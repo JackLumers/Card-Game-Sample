@@ -1899,7 +1899,7 @@ MonoBehaviour:
   turnTimer: {fileID: 128036166}
   resetButton: {fileID: 1953975177}
   turnCounterText: {fileID: 1012641836}
-  initialState: {fileID: 11400000, guid: 2dc861900bdef934383d0672ab26510c, type: 2}
+  initialState: {fileID: 11400000, guid: 96584d5245e49d540aca67fc4f91c160, type: 2}
   battleStates:
   - {fileID: 11400000, guid: 2dc861900bdef934383d0672ab26510c, type: 2}
   - {fileID: 11400000, guid: 96584d5245e49d540aca67fc4f91c160, type: 2}

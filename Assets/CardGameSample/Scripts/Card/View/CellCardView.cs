@@ -3,7 +3,9 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
+using JetBrains.Annotations;
 using TMPro;
+using ToolBox.Pools;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -40,35 +42,34 @@ namespace CardGameSample.Scripts.Card.View
             set => healthPointsText.text = $"{healthPrefix} {value}";
         }
 
-        public string CardSprite
+        public string SpriteId
         {
             set => LoadCardSprite(value).Forget();
         }
 
-        public async UniTask Show(bool show)
+        public async UniTask ShowAnimation(bool show)
         {
             try
             {
                 if (show)
                 {
                     gameObject.SetActive(true);
+                    canvasGroup.alpha = 0;
+                    
                     _fadeTweener?.Kill();
-                    await _fadeTweener;
                     _fadeTweener = canvasGroup.DOFade(1, showDuration);
+                    await _fadeTweener;
+                    _fadeTweener = null;
                 }
                 else
                 {
-                    if (gameObject.activeInHierarchy)
-                    {
-                        _fadeTweener?.Kill();
-                        _fadeTweener = canvasGroup.DOFade(0, showDuration);
-                        await _fadeTweener;
-                        gameObject.SetActive(false);
-                    }
-                    else
-                    {
-                        gameObject.SetActive(false);
-                    }
+                    canvasGroup.alpha = 1;
+                    
+                    _fadeTweener?.Kill();
+                    _fadeTweener = canvasGroup.DOFade(0, showDuration);
+                    await _fadeTweener;
+                    _fadeTweener = null;
+                    gameObject.SetActive(false);
                 }
             }
             catch (Exception e)

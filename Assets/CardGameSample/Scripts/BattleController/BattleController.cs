@@ -8,6 +8,7 @@ using CardGameSample.Scripts.Card.View;
 using CardGameSample.Scripts.ScriptableValues;
 using CardGameSample.Scripts.Timer;
 using Cysharp.Threading.Tasks;
+using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -35,14 +36,14 @@ namespace CardGameSample.Scripts.BattleController
         
         private BattleStateMachine _stateMachine;
         
-        private CancellationTokenSource _fillingPlayerHandCts;
-        private CancellationTokenSource _fillingEnemyHandCts;
-        private CancellationTokenSource _placingCardOnCellCts;
+        [CanBeNull] private CancellationTokenSource _fillingPlayerHandCts;
+        [CanBeNull] private CancellationTokenSource _fillingEnemyHandCts;
+        [CanBeNull] private CancellationTokenSource _placingCardOnCellCts;
 
         /// <summary>
         /// Called when player placed a card.
         /// </summary>
-        public Action<CardModelRef, BattlefieldCell> CardPlaced;
+        public event Action<HandCardView, BattlefieldCell> CardPlaced;
         
         public int CurrentTurnCount { get; private set; }
         
@@ -56,12 +57,18 @@ namespace CardGameSample.Scripts.BattleController
                 battleState.Initialize(this, _stateMachine);
             }
             
-            cardsHandInputHandler.CallPlaceCard += (handCardView, objectForCardPlacing) => 
-                OnCallPlaceCard(handCardView, objectForCardPlacing).Forget();
+            cardsHandInputHandler.CallPlaceCard += OnCallPlaceCard;
             
             resetButton.onClick.AddListener(ResetState);
             
             StartBattle();
+        }
+
+        private void OnDestroy()
+        {
+            // States are ScriptableObjects so we need to reset
+            // them because they are living outside playmode too
+            _stateMachine.CurrentState.ResetState();
         }
 
         public void StartBattle()
@@ -77,6 +84,7 @@ namespace CardGameSample.Scripts.BattleController
             _fillingPlayerHandCts?.Cancel();
             _fillingEnemyHandCts?.Cancel();
             _placingCardOnCellCts?.Cancel();
+            
             _placingCardOnCellCts = new CancellationTokenSource();
             
             turnTimer.StopTimer();
@@ -112,7 +120,10 @@ namespace CardGameSample.Scripts.BattleController
                     int randomCardIndex = Random.Range(0, testCardDeck.Cards.Count);
                     
                     await cardsHand.AddCard(testCardDeck.Cards[randomCardIndex])
-                        .AttachExternalCancellation(_fillingPlayerHandCts.Token);
+                        .AttachExternalCancellation(_fillingPlayerHandCts.Token)
+                        .SuppressCancellationThrow();
+                    
+                    if(_fillingPlayerHandCts.IsCancellationRequested) return;
                 }
             }
             catch (Exception e)
@@ -134,7 +145,10 @@ namespace CardGameSample.Scripts.BattleController
                     int randomCardIndex = Random.Range(0, testCardDeck.Cards.Count);
                     
                     await cell.PlaceCard(testCardDeck.Cards[randomCardIndex])
-                        .AttachExternalCancellation(_fillingEnemyHandCts.Token);
+                        .AttachExternalCancellation(_fillingEnemyHandCts.Token)
+                        .SuppressCancellationThrow();
+                    
+                    if(_fillingEnemyHandCts.IsCancellationRequested) return;
                 }
             }
             catch (Exception e)
@@ -144,29 +158,12 @@ namespace CardGameSample.Scripts.BattleController
             }
         }
 
-        private async UniTask OnCallPlaceCard(HandCardView handCardView, GameObject objectForCardPlacing)
+        private void OnCallPlaceCard(HandCardView handCardView, GameObject objectForCardPlacing)
         {
-            try
-            {
-                if (objectForCardPlacing.TryGetComponent(out BattlefieldCell cell))
-                {
-                    CardModelRef modelRef = handCardView.Presenter.CardModelRef;
-                
-                    await handCardView.AnimatePlaceCardOnCell(handCardView, cell)
-                        .AttachExternalCancellation(_placingCardOnCellCts.Token);
-                
-                    cardsHand.RemoveCard(handCardView);
-                
-                    await cell.PlaceCard(modelRef);
-
-                    CardPlaced?.Invoke(modelRef, cell);
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-                throw;
-            }
+            if (!objectForCardPlacing.TryGetComponent(out BattlefieldCell cell)) return;
+            cardsHand.RemoveCard(handCardView);
+            cardsHand.RepositionCards().Forget();
+            CardPlaced?.Invoke(handCardView, cell);
         }
     }
 }

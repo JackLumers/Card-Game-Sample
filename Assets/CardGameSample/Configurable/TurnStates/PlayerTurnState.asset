@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: PlayerTurnState
   m_EditorClassIdentifier: 
   nextState: {fileID: 11400000, guid: 96584d5245e49d540aca67fc4f91c160, type: 2}
-  turnDurationMillis: 3000
+  turnDurationMillis: 15000

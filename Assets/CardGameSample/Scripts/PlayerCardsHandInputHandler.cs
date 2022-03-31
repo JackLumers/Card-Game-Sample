@@ -19,7 +19,7 @@ namespace CardGameSample.Scripts
         }
 
         /// <summary>
-        /// Called when player canceled hold action and card is above object where card can be placed.
+        /// Called when player canceled hold action and card is above object where it can be placed.
         /// This object is defined by <see cref="placeObjectLayerMask"/>
         /// </summary>
         public event Action<HandCardView, GameObject> CallPlaceCard;
@@ -59,7 +59,6 @@ namespace CardGameSample.Scripts
                 // If card is above something with needed layerMask
                 if (Physics.Raycast(ray, out RaycastHit hit, holdableObjectInputHandler.Camera.farClipPlane, placeObjectLayerMask))
                 {
-                    Debug.Log("Place card called!");
                     CallPlaceCard?.Invoke(cardView, hit.collider.gameObject);
                 }
                 else

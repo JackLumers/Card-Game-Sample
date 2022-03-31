@@ -43,17 +43,10 @@ namespace CardGameSample.Scripts.Input
         private void OnDisable()
         {
             // Touched or left button clicked
-            inputModule.leftClick.action.performed += OnLeftClick;
+            inputModule.leftClick.action.performed -= OnLeftClick;
 
             // Touch or pointer moved
-            inputModule.point.action.performed += OnPointMoved;
-
-            if (!ReferenceEquals(HoldenObject, null))
-            {
-                HoldenObject.Hold(LastPointerPosition, false);
-                Holden?.Invoke(HoldenObject.GameObject, LastPointerPosition, false);
-                HoldenObject = null;
-            }
+            inputModule.point.action.performed -= OnPointMoved;
         }
 
         private void OnLeftClick(InputAction.CallbackContext context)

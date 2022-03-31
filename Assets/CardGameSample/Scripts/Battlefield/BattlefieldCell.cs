@@ -15,15 +15,24 @@ namespace CardGameSample.Scripts.Battlefield
 
         public Canvas CellCanvas => cellCanvas;
         
+        public int Index { get; private set; }
+        
         [CanBeNull]
         public CellCardView Card { get; private set; }
-
+        
+        public void Initialize(int index)
+        {
+            Index = index;
+        }
+        
+        /// <summary>
+        /// Places card from in cell with animation.
+        /// Card reference sets on call, but animation can be waited.
+        /// </summary>
         public async UniTask PlaceCard(CardModelRef cardModelRef)
         {
             try
             {
-                RemoveCard();
-
                 var cardView = cellCardPrefab.gameObject.Reuse().GetComponent<CellCardView>();
                 Card = cardView;
             
@@ -35,7 +44,7 @@ namespace CardGameSample.Scripts.Battlefield
                 cardTransform.localScale = Vector3.one;
                 cardTransform.localRotation = Quaternion.identity;
 
-                await cardView.Show(true);
+                await cardView.ShowAnimation(true);
             }
             catch (Exception e)
             {
@@ -44,12 +53,26 @@ namespace CardGameSample.Scripts.Battlefield
             }
         }
 
-        public void RemoveCard()
+        /// <summary>
+        /// Removes card from cell.
+        /// </summary>
+        public async UniTask RemoveCard()
         {
             if (!ReferenceEquals(Card, null))
             {
-                Card.Show(false).Forget();
+                var removedCard = Card;
                 Card = null;
+
+                try
+                {
+                    await removedCard.ShowAnimation(false);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                }
+                
+                removedCard.gameObject.Release();
             }
         }
     }

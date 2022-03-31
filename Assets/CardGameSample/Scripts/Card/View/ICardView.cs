@@ -11,6 +11,6 @@
         /// <summary>
         /// Sets the key for card sprite and updates the sprite
         /// </summary>
-        public string CardSprite { set; }
+        public string SpriteId { set; }
     }
 }

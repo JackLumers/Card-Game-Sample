@@ -6,7 +6,6 @@ using System.Threading;
 using CardGameSample.Scripts.Card;
 using CardGameSample.Scripts.Card.View;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using ToolBox.Pools;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,6 +28,12 @@ namespace CardGameSample.Scripts
         public ReadOnlyCollection<HandCardView> Cards => _cardsSet.ToList().AsReadOnly();
 
         private CancellationTokenSource _repositioningCardsCts;
+        private CancellationTokenSource _resetCts;
+
+        private void Awake()
+        {
+            _resetCts = new CancellationTokenSource();
+        }
 
         /// <summary>
         /// Sets initial empty state of the hand.
@@ -36,6 +41,8 @@ namespace CardGameSample.Scripts
         public void ResetState()
         {
             _repositioningCardsCts?.Cancel();
+            _resetCts?.Cancel();
+            _resetCts = new CancellationTokenSource();
             
             foreach (var handCardView in _cardsSet.ToList())
             {
@@ -49,9 +56,6 @@ namespace CardGameSample.Scripts
         /// </summary>
         public async UniTask AddCard(CardModelRef modelRef)
         {
-            _repositioningCardsCts?.Cancel();
-            _repositioningCardsCts = new CancellationTokenSource();
-            
             // TODO: Can be optimized using different pooling approach.
             // Used pooling system don't have a solution for this because we are bound to the GameObject
             // and there is no way to override GetComponent call for caching the result.
@@ -68,17 +72,23 @@ namespace CardGameSample.Scripts
             cardTransform.localScale = Vector3.one;
 
             _cardsSet.Add(cardObject);
-            
-            await RepositionCards().AttachExternalCancellation(_repositioningCardsCts.Token);
+
+            try
+            {
+                await RepositionCards().SuppressCancellationThrow();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                throw;
+            }
         }
 
         /// <summary>
-        /// Removes card from hand, deactivating card view and returning it to the pool.
+        /// Removes card from hand's card set.
         /// </summary>
         public void RemoveCard(HandCardView cardView)
         {
-            cardView.gameObject.SetActive(false);
-            cardView.gameObject.Release();
             _cardsSet.Remove(cardView);
         }
 
@@ -89,6 +99,9 @@ namespace CardGameSample.Scripts
 
         public async UniTask RepositionCards()
         {
+            _repositioningCardsCts?.Cancel();
+            _repositioningCardsCts = new CancellationTokenSource();
+
             try
             {
                 if (_cardsSet.Count == 0) return;
@@ -101,16 +114,26 @@ namespace CardGameSample.Scripts
                 int i = 0;
                 foreach (var handCardView in _cardsSet.ToList())
                 {
-                    animationTasks.Add(handCardView.MoveLocal(positions[i], repositioningTime, false));
-                    animationTasks.Add(handCardView.Rotate(cardsContainer.rotation, repositioningTime, false));
+                    if(_repositioningCardsCts.IsCancellationRequested) return;
+                    
+                    animationTasks.Add(handCardView.MoveLocal(positions[i], repositioningTime, false)
+                        .AttachExternalCancellation(_repositioningCardsCts.Token)
+                        .AttachExternalCancellation(_resetCts.Token)
+                        .SuppressCancellationThrow());
+
+                    animationTasks.Add(handCardView.Rotate(cardsContainer.rotation, repositioningTime, false)
+                        .AttachExternalCancellation(_repositioningCardsCts.Token)
+                        .AttachExternalCancellation(_resetCts.Token)
+                        .SuppressCancellationThrow());
                     i++;
                 }
-
-                await UniTask.WhenAll(animationTasks);
-            }
-            catch (OperationCanceledException e)
-            {
-                Debug.LogWarning(e);
+                
+                if(_repositioningCardsCts.IsCancellationRequested) return;
+                
+                await UniTask.WhenAll(animationTasks)
+                    .AttachExternalCancellation(_repositioningCardsCts.Token)
+                    .AttachExternalCancellation(_resetCts.Token)
+                    .SuppressCancellationThrow();
             }
             catch (Exception e)
             {
