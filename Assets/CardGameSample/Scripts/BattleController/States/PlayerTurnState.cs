@@ -111,12 +111,18 @@ namespace CardGameSample.Scripts.BattleController.States
             
             if (_stateCancellationTokenSource.IsCancellationRequested) return;
             
-            await cell.PlaceCard(modelRef);
+            await cell.PlaceCard(modelRef)
+                .AttachExternalCancellation(_stateCancellationTokenSource.Token)
+                .SuppressCancellationThrow();
+            
+            if (_stateCancellationTokenSource.IsCancellationRequested) return;
             
             await BattleController.BattlefieldController.PlayerCellAttack(cell)
                 .AttachExternalCancellation(_stateCancellationTokenSource.Token)
                 .SuppressCancellationThrow();
 
+            if (_stateCancellationTokenSource.IsCancellationRequested) return;
+            
             if (_currentsCardsPlayedCount == maxCardsToPlay)
             {
                 BattleController.TurnTimer.StopAndSetDuration(0);

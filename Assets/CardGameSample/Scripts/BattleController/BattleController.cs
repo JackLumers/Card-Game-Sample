@@ -90,7 +90,7 @@ namespace CardGameSample.Scripts.BattleController
             turnTimer.StopTimer();
             SetTurnCount(0);
             
-            _stateMachine.CurrentState.ResetState();
+            _stateMachine.ResetState();
             battlefieldController.ResetState();
             cardsHand.ResetState();
             
