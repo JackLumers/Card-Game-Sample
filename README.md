@@ -8,9 +8,9 @@ A card game sample that was made as a test task project. Android platform suppor
 # Configuration
 In the [Configurable] folder you can configure:
 - Card data values;
-- Max card amount in hand;
+- Max cards amount in hand;
 - Turn duration;
-- Cards in random deck;
+- Cards in test random deck;
 
 # Build
 After setting the Android flatform, Build Addressables in [Window] -> [Asset Managment] -> [Addressables]. 
