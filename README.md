@@ -1,5 +1,5 @@
 # Card-Game-Sample
-Card game sample. Android platform supported.
+A card game sample that was made as a test task project. Android platform supported.
 
 # Project installation
 1. Enable Touch Screen Simulation in Input System Debugger.
