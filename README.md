@@ -1,16 +1,22 @@
 # Card-Game-Sample
 Card game sample. Android platform supported.
 
-# Project installation:
+# Project installation
 1. Enable Touch Screen Simulation in Input System Debugger.
-2. Build Addressables in [Window] -> [Asset Managment] -> [Addressables]
+2. Enjoy playmode
 
-# Configuration:
+# Configuration
 In the [Configurable] folder you can configure:
 - Card data values;
 - Max card amount in hand;
 - Turn duration;
 - Cards in random deck;
+
+# Build
+After setting the Android flatform, Build Addressables in [Window] -> [Asset Managment] -> [Addressables]. 
+Works on IL2PP, Net 4.x, ArmV7, Android API level from 19 to 30 included.
+Not tested on other settings.
+Not tested on standalone.
 
 # P.S.
 There is quite a mess in the codebase. I didn't handle asynchronous state changes in the way that it wood seems nice and easy to read and work with.
