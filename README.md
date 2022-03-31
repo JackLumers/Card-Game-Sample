@@ -23,8 +23,8 @@ There is quite a mess in the codebase. I didn't handle asynchronous state change
 At the time I have some problems with separating logic and visualization, but I really want to work in this direction and learn architecture best-practices.
 Tryied MVP pattern for the card objects and it's seems to work, but I'm sure there was a better approach and I eventualy broke the pattern 'cause there is too many dependencies on Views.
 
-Thank you for reading this far! I will be glad to know how to separate logic and visuals properly and better approach for the acync processes.
-You can write me on Telegram on my GitHub profile if you want.
+Thank you for reading this far! I will be glad to know how to separate logic and visuals properly and better approaches for the acync processes.
+You can write me on Telegram if you want, link in the profile.
 
 # Used Assets:
 - TextMeshPro
