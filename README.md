@@ -19,7 +19,7 @@ Not tested on other settings.
 Not tested on standalone.
 
 # P.S.
-There is quite a mess in the codebase. I didn't handle asynchronous state changes in the way that it wood seems nice and easy to read and work with.
+There is quite a mess in the codebase. I didn't handle asynchronous state changes in the way that it wood seem nice and easy to read and work with.
 At the time I have some problems with separating logic and visualization, but I really want to work in this direction and learn architecture best-practices.
 Tryied MVP pattern for the card objects and it's seems to work, but I'm sure there was a better approach and I eventualy broke the pattern 'cause there is too many dependencies on Views.
 
