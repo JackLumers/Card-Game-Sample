@@ -13,7 +13,7 @@ In the [Configurable] folder you can configure:
 - Cards in test random deck;
 
 # Build
-After setting the Android flatform, Build Addressables in [Window] -> [Asset Managment] -> [Addressables]. 
+After setting the Android flatform, before making game build, ensure you first build Addressables assets in [Window] -> [Asset Managment] -> [Addressables]. 
 Works on IL2CPP, .Net 4.x, ArmV7, Android API level from 19 to 30 included.
 Not tested on other settings.
 Not tested on standalone.
