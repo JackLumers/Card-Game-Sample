@@ -14,7 +14,8 @@ In the [Configurable] folder you can configure:
 
 # Build
 After setting the Android flatform, before making game build, ensure you first build Addressables assets in [Window] -> [Asset Managment] -> [Addressables]. 
-Game Works on IL2CPP, .Net 4.x, ArmV7, Android API level from 19 to 30 included.
+
+Game works on IL2CPP, .Net 4.x, ArmV7, Android API level from 19 to 30 included.
 Not tested on other settings.
 Not tested on standalone.
 
